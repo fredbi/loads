@@ -28,6 +28,36 @@ import (
 func init() {
 	gob.Register(map[string]interface{}{})
 	gob.Register([]interface{}{})
+<<<<<<< HEAD
+=======
+}
+
+// AddLoader for a document
+func AddLoader(predicate DocMatcher, load DocLoader) {
+	prev := loaders
+	loaders = &loader{
+		Match: predicate,
+		Fn:    load,
+		Next:  prev,
+	}
+	spec.PathLoader = loaders.Fn
+}
+
+type loader struct {
+	Fn    DocLoader
+	Match DocMatcher
+	Next  *loader
+}
+
+// JSONSpec loads a spec from a json document
+func JSONSpec(path string) (*Document, error) {
+	data, err := JSONDoc(path)
+	if err != nil {
+		return nil, err
+	}
+	// convert to json
+	return Analyzed(data, "")
+>>>>>>> 7956deb (xp fix #1281)
 }
 
 // Document represents a swagger spec document

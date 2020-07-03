@@ -86,7 +86,7 @@ func TestFailsInvalidJSON(t *testing.T) {
 }
 
 // issue go-swagger/go-swagger#1816 (regression when cloning original spec)
-func TestIssue1846(t *testing.T) {
+func TestIssue1816(t *testing.T) {
 	swaggerFile := "fixtures/bugs/1816/fixture-1816.yaml"
 	document, err := Spec(swaggerFile)
 	require.NoError(t, err)
@@ -108,6 +108,7 @@ func TestIssue1846(t *testing.T) {
 	}
 }
 
+<<<<<<< HEAD
 func TestEmbedded(t *testing.T) {
 	swaggerFile := "fixtures/yaml/swagger/spec.yml"
 	document, err := Spec(swaggerFile)
@@ -162,6 +163,43 @@ func TestDocument(t *testing.T) {
 	require.NoError(t, err)
 
 	require.JSONEq(t, string(PetStoreJSONMessage), string(afterReset))
+=======
+func TestIssue1816_security(t *testing.T) {
+	swaggerFile := "fixtures/bugs/1816/swagger.json"
+	document, err := Spec(swaggerFile)
+	assert.NoError(t, err)
+	assert.NotNil(t, document)
+
+	sp, err := cloneSpec(document.Spec())
+	assert.NoError(t, err)
+	jazon, _ := json.MarshalIndent(sp, "", " ")
+	t.Logf("%s", string(jazon))
+	/*
+		rex := regexp.MustCompile(`"\$ref":\s*"(.+)"`)
+		m := rex.FindAllStringSubmatch(string(jazon), -1)
+		if assert.NotNil(t, m) {
+			for _, matched := range m {
+				subMatch := matched[1]
+				if !assert.True(t, strings.HasPrefix(subMatch, "#/definitions") || strings.HasPrefix(subMatch, "#/responses"),
+					"expected $ref to point either to definitions or responses section, got: %s", matched[0]) {
+					t.FailNow()
+				}
+			}
+		}
+	*/
+}
+
+func TestIssue1281Security(t *testing.T) {
+	swaggerFile := "fixtures/bugs/1281/fixture-1281.json"
+	document, err := Spec(swaggerFile)
+	assert.NoError(t, err)
+	assert.NotNil(t, document)
+
+	sp, err := cloneSpec(document.Spec())
+	assert.NoError(t, err)
+	jazon, _ := json.MarshalIndent(sp, "", " ")
+	t.Logf("%s", string(jazon))
+>>>>>>> 7956deb (xp fix #1281)
 }
 
 func BenchmarkAnalyzed(b *testing.B) {
