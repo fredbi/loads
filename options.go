@@ -8,6 +8,7 @@ import "github.com/go-openapi/swag/loading"
 type options struct {
 	loader         *loader
 	loadingOptions []loading.Option
+	xorder         bool
 }
 
 func defaultOptions() *options {
@@ -26,6 +27,15 @@ func loaderFromOptions(options []LoaderOption) *loader {
 	l.loadingOptions = opts.loadingOptions
 
 	return l
+}
+
+func isXOrderInOptions(options []LoaderOption) bool {
+	opts := defaultOptions()
+	for _, apply := range options {
+		apply(opts)
+	}
+
+	return opts.xorder
 }
 
 // LoaderOption allows to fine-tune the spec loader behavior
@@ -73,5 +83,14 @@ func WithDocLoaderMatches(l ...DocLoaderWithMatch) LoaderOption {
 func WithLoadingOptions(loadingOptions ...loading.Option) LoaderOption {
 	return func(opt *options) {
 		opt.loadingOptions = loadingOptions
+	}
+}
+
+// WithAutoXOrder inserts "x-order" extension to all object properties
+// so that further spec unmarshaling can maintain the order of keys from
+// the original document.
+func WithAutoXOrder(xorder bool) LoaderOption {
+	return func(opt *options) {
+		opt.xorder = xorder
 	}
 }

@@ -46,6 +46,14 @@ func JSONSpec(path string, opts ...LoaderOption) (*Document, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	if isXOrderInOptions(opts) {
+		data, err = preprocessXOrder(formatKindJSON, data)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	// convert to json
 	doc, err := Analyzed(data, "", opts...)
 	if err != nil {
@@ -80,12 +88,19 @@ func Embedded(orig, flat json.RawMessage, opts ...LoaderOption) (*Document, erro
 func Spec(path string, opts ...LoaderOption) (*Document, error) {
 	ldr := loaderFromOptions(opts)
 
-	b, err := ldr.Load(path)
+	data, err := ldr.Load(path)
 	if err != nil {
 		return nil, err
 	}
 
-	document, err := Analyzed(b, "", opts...)
+	if isXOrderInOptions(opts) {
+		data, err = preprocessXOrder(data)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	document, err := Analyzed(data, "", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -101,6 +116,7 @@ func Analyzed(data json.RawMessage, version string, options ...LoaderOption) (*D
 	if version == "" {
 		version = "2.0"
 	}
+
 	if version != "2.0" {
 		return nil, fmt.Errorf("spec version %q is not supported: %w", version, ErrLoads)
 	}
